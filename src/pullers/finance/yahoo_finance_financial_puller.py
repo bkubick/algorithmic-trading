@@ -11,7 +11,7 @@ from numpy import float64
 from pandas import DataFrame
 
 from src.enums.finance import Ticker
-from src.pullers.financial_puller import FinancialPuller
+from src.interface.pullers.financial_puller import FinancialPuller
 from src.utils.finance import numeric_from_str, TICKERS
 
 
@@ -34,13 +34,13 @@ class YahooFinanceFinancialPuller(FinancialPuller):
 
     def _get_response(self, url: str) -> Optional[requests.Response]:
         """ Gets the response for the corresponding url and caches the response if the response is
-        a valid 200.
-        
-        Args:
-            url (str): Url to request a response from
-        
-        Returns:
-            200 Response for the corresponding url, or None
+            a valid 200.
+
+            Args:
+                url (str): Url to request a response from
+            
+            Returns:
+                200 Response for the corresponding url, or None
         """
         if self._response_cache.get(url):
             response = self._response_cache.get(url)
@@ -56,13 +56,13 @@ class YahooFinanceFinancialPuller(FinancialPuller):
 
     def _get_response_from_ticker(self, ticker: Ticker, page: YahooFinancePage) -> Optional[requests.Response]:
         """ Gets the response for the corresponding Ticker and page
-        
-        Args:
-            ticker (Ticker): Ticker of the company to retrieve data from
-            page (YahooFinancePage): Corresponding page that the data is being retrieved from
-        
-        Returns:
-            200 Response for the corresponding page, or None
+
+            Args:
+                ticker (Ticker): Ticker of the company to retrieve data from
+                page (YahooFinancePage): Corresponding page that the data is being retrieved from
+            
+            Returns:
+                200 Response for the corresponding page, or None
         """
         ticker_value = TICKERS.get(ticker)
         if ticker_value is None:
@@ -79,14 +79,14 @@ class YahooFinanceFinancialPuller(FinancialPuller):
         # TODO Currently, YahooFinance dynamically loads rows, but by default, has 100 on the page.
         # I need to make this scrape by 1-6 month intervals in order to get the remaining data
         """ Gets historical data from the corresponding ticker
-        
-        Args:
-            ticker (Ticker): Ticker of the company to retrieve historical data from
-        
-        Returns
-            Dataframe for the corresponding Ticker with the following index and columns
-            index: 'date'
-            columns: ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+
+            Args:
+                ticker (Ticker): Ticker of the company to retrieve historical data from
+            
+            Returns
+                Dataframe for the corresponding Ticker with the following index and columns
+                index: 'date'
+                columns: ['open', 'high', 'low', 'close', 'adj_close', 'volume']
         """
         response = self._get_response_from_ticker(ticker=ticker, page=YahooFinancePage.HISTORICAL_DATA)
 
@@ -118,14 +118,14 @@ class YahooFinanceFinancialPuller(FinancialPuller):
 
     def get_daily_for_tickers(self, tickers: List[Ticker]) -> Dict[Ticker, DataFrame]:
         """ Gets historical data from the corresponding tickers
-        
-        Args:
-            tickers (List[Ticker]): List of tickers for the companies to retrieve historical data
-        
-        Returns
-            Dictionary of dataframes for the corresponding Tickers with the following index and columns
-            index: 'date'
-            columns: ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+
+            Args:
+                tickers (List[Ticker]): List of tickers for the companies to retrieve historical data
+            
+            Returns
+                Dictionary of dataframes for the corresponding Tickers with the following index and columns
+                index: 'date'
+                columns: ['open', 'high', 'low', 'close', 'adj_close', 'volume']
         """
         data = {}
         for ticker in tickers:

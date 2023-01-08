@@ -5,7 +5,7 @@ from pandas import DataFrame
 import yfinance as yf
 
 from src.enums.finance import Ticker
-from src.pullers.financial_puller  import FinancialPuller
+from src.interface.pullers.financial_puller  import FinancialPuller
 from src.utils.finance import TICKERS
 
 
@@ -13,21 +13,21 @@ class YFinanceFinancialPuller(FinancialPuller):
 
     def _clean_daily_dataframe(self, dataframe: DataFrame) -> DataFrame:
         dataframe = dataframe.rename_axis('date')
-        dataframe.columns = ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+        dataframe.columns = self.DAILY_COLUMNS
         dataframe.dropna(axis=0, how='any', inplace=True)
 
         return dataframe
 
     def get_daily_for_ticker(self, ticker: Ticker) -> DataFrame:
         """ Gets historical data from the corresponding ticker
-        
-        Args:
-            ticker (Ticker): Ticker of the company to retrieve historical data from
-        
-        Returns
-            Dataframe for the corresponding Ticker with the following index and columns
-            index: 'date'
-            columns: ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+
+            Args:
+                ticker (Ticker): Ticker of the company to retrieve historical data from
+            
+            Returns
+                Dataframe for the corresponding Ticker with the following index and columns
+                index: 'date'
+                columns: ['open', 'high', 'low', 'close', 'adj_close', 'volume']
         """
         ticker_value = TICKERS.get(ticker)
 
@@ -41,14 +41,14 @@ class YFinanceFinancialPuller(FinancialPuller):
 
     def get_daily_for_tickers(self, tickers: List[Ticker]) -> Dict[Ticker, DataFrame]:
         """ Gets historical data from the corresponding tickers
-        
-        Args:
-            tickers (List[Ticker]): List of tickers for the companies to retrieve historical data
-        
-        Returns
-            Dictionary of dataframes for the corresponding Tickers with the following index and columns
-            index: 'date'
-            columns: ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+
+            Args:
+                tickers (List[Ticker]): List of tickers for the companies to retrieve historical data
+            
+            Returns
+                Dictionary of dataframes for the corresponding Tickers with the following index and columns
+                index: 'date'
+                columns: ['open', 'high', 'low', 'close', 'adj_close', 'volume']
         """
         data = {}
 

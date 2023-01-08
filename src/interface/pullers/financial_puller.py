@@ -9,6 +9,8 @@ from src.enums.finance import Ticker
 
 class FinancialPuller(ABC):
 
+    DAILY_COLUMNS: List[str] = ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+
     @abstractmethod
     def get_daily_for_ticker(self, ticker: Ticker) -> DataFrame:
         """ Gets historical data from the corresponding ticker
