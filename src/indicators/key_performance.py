@@ -21,7 +21,7 @@ def cagr(df: DataFrame) -> float:
 
     new_df['return'] = new_df['adj_close'].pct_change()
     new_df['cum_return'] = (1 + new_df['return']).cumprod()
-    
+
     cagr = (new_df['cum_return'][-1])**(1/n) - 1
     return cagr
 
@@ -79,7 +79,7 @@ def sortino_ratio(df: DataFrame, rf: float = 0.03) -> float:
     return ratio
 
 
-def maximum_drawdown(df: DataFrame):
+def maximum_drawdown(df: DataFrame) -> float:
     """ Calculates the Maximum Drawdown for the given dataframe.
 
         Args:
@@ -100,7 +100,7 @@ def maximum_drawdown(df: DataFrame):
     return drawdown
 
 
-def calmar_ratio(df: DataFrame):
+def calmar_ratio(df: DataFrame) -> float:
     """ Calculates the Calmar Ratio for the given dataframe.
 
         Args:
