@@ -8,6 +8,11 @@ A toolbox that hosts utlities, classes, and various trading algorithms for tradi
 
 **NOTE** This repository is my personalized toolbox from the Udemy Course, [Algorithmic Trading Quantitative Analysis Using Python](https://www.udemy.com/course/algorithmic-trading-quantitative-analysis-using-python/), and is still under development.
 
+## Tech Stack
+<img style="padding-right:20px;" alt="Pandas" src="https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white"/>
+<img style="padding-right:20px;" alt="Matplotlib" src="https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black)"/>
+<img style="padding-right:20px;" alt="Numpy" src="https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white"/>
+
 ## Setup
 
 I run this toolbox currently through a virtual environment and install all requirements directly through `pip install -r requirements.txt`. I have plans to set this up using a `setup.py` in the near future that way it can be installed directly through pip and this repository link, but this is a side project that I will continue to develop casually.
