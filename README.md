@@ -9,6 +9,7 @@ A toolbox that hosts utlities, classes, and various trading algorithms for tradi
 **NOTE** This repository is my personalized toolbox from the Udemy Course, [Algorithmic Trading Quantitative Analysis Using Python](https://www.udemy.com/course/algorithmic-trading-quantitative-analysis-using-python/), and is still under development.
 
 ## Tech Stack
+<img style="padding-right:20px;" align=left alt="TensorFlow" src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54"/>
 <img style="padding-right:20px;" align=left alt="Pandas" src="https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white"/>
 <img style="padding-right:20px;" align=left alt="Matplotlib" src="https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black)"/>
 <img style="padding-right:20px;" alt="Numpy" src="https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white"/>
