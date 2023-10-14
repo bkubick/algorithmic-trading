@@ -4,7 +4,7 @@ from typing import Dict, Union
 
 from numpy import float64
 
-from src.enums.finance import Ticker
+from ..enums.finance import Ticker
 
 
 Numeric = Union[Decimal, int, float, float64]

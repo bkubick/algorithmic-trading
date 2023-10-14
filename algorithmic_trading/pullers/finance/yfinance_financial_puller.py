@@ -4,14 +4,24 @@ from typing import Dict, List
 from pandas import DataFrame
 import yfinance as yf
 
-from src.enums.finance import Ticker
-from src.interface.pullers.financial_puller  import FinancialPuller
-from src.utils.finance import TICKERS
+from ...enums.finance import Ticker
+from ...interface.pullers.financial_puller  import FinancialPuller
+from ...utils.finance import TICKERS
 
 
 class YFinanceFinancialPuller(FinancialPuller):
 
     def _clean_daily_dataframe(self, dataframe: DataFrame) -> DataFrame:
+        """ Cleans the dataframe to ensure that the index is the date and the columns are the following:
+
+            ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+
+            Args:
+                dataframe (DataFrame): Dataframe to clean
+            
+            Returns:
+                Cleaned dataframe
+        """
         dataframe = dataframe.rename_axis('date')
         dataframe.columns = self.DAILY_COLUMNS
         dataframe.dropna(axis=0, how='any', inplace=True)

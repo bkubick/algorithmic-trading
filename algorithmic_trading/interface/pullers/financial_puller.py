@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from pandas import DataFrame
 
-from src.enums.finance import Ticker
+from ...enums.finance import Ticker
 
 
 class FinancialPuller(ABC):

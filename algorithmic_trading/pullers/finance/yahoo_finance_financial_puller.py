@@ -10,9 +10,9 @@ from bs4.element import Tag
 from numpy import float64
 from pandas import DataFrame
 
-from src.enums.finance import Ticker
-from src.interface.pullers.financial_puller import FinancialPuller
-from src.utils.finance import numeric_from_str, TICKERS
+from ...enums.finance import Ticker
+from ...interface.pullers.financial_puller import FinancialPuller
+from ...utils.finance import numeric_from_str, TICKERS
 
 
 class YahooFinancePage(Enum):
