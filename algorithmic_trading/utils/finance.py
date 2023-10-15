@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import typing
+
 import pandas as pd
 
 from . import types
@@ -44,3 +46,44 @@ def get_return_from_adj_close(dataframe: pd.DataFrame,
     dataframe_copy.fillna(fill_na, inplace=True)
 
     return dataframe_copy
+
+
+# TODO: This ticker changes over time, so I need to figure out how to handle this
+def get_dow_jones_tickers() -> typing.List[str]:
+    """ Returns the list of tickers for the Dow Jones Industrial Average
+
+        Returns:
+            (List[str]) List of tickers for the Dow Jones Industrial Average
+    """
+    return [
+        'MMM',
+        'AXP',
+        'AMGN',
+        'AAPL',
+        'BA',
+        'CAT',
+        'CVX',
+        'CSCO',
+        'KO',
+        'DIS',
+        'DOW',
+        'GS',
+        'HD',
+        'HON',
+        'INTC',
+        'IBM',
+        'JNJ',
+        'JPM',
+        'MCD',
+        'MRK',
+        'MSFT',
+        'NKE',
+        'PG',
+        'CRM',
+        'TRV',
+        'UNH',
+        'VZ',
+        'V',
+        'WBA',
+        'WMT',
+    ]
