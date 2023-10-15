@@ -5,7 +5,6 @@ from typing import Dict, List, Optional
 from pandas import DataFrame
 import yfinance as yf
 
-from ...enums.finance import Ticker
 from .financial_puller  import FinancialPuller
 from ... import utils
 
@@ -30,13 +29,13 @@ class YFinanceFinancialPuller(FinancialPuller):
         return dataframe
 
     def get_daily_for_tickers(self,
-                              tickers: List[Ticker],
+                              tickers: List[str],
                               start: Optional[utils.types.DateType] = None,
-                              end: Optional[utils.types.DateType] = None) -> Dict[Ticker, DataFrame]:
+                              end: Optional[utils.types.DateType] = None) -> Dict[str, DataFrame]:
         """ Gets historical data from the corresponding tickers
 
             Args:
-                tickers (List[Ticker]): List of tickers for the companies to retrieve historical data
+                tickers (List[str]): List of tickers for the companies to retrieve historical data
                 start (Optional[DateType]): Start date (inclusive) for the historical data
                 end (Optional[DateType]): End date (inclusive) for the historical data
 
@@ -50,21 +49,19 @@ class YFinanceFinancialPuller(FinancialPuller):
         data = {}
 
         for ticker in tickers:
-            ticker_value = ticker.value
-            if ticker_value is not None:
-                dataframe: DataFrame = yf.download(tickers=ticker_value, interval='1d', start=start, end=end)
-                data[ticker] = self._clean_daily_dataframe(dataframe)
+            dataframe: DataFrame = yf.download(tickers=ticker, interval='1d', start=start, end=end)
+            data[ticker] = self._clean_daily_dataframe(dataframe)
 
         return data
 
     def get_monthly_for_tickers(self,
-                                tickers: List[Ticker],
+                                tickers: List[str],
                                 start: Optional[utils.types.DateType] = None,
-                                end: Optional[utils.types.DateType] = None) -> Dict[Ticker, DataFrame]:
+                                end: Optional[utils.types.DateType] = None) -> Dict[str, DataFrame]:
         """ Gets historical data from the corresponding tickers
 
             Args:
-                tickers (List[Ticker]): List of tickers for the companies to retrieve historical data
+                tickers (List[str]): List of tickers for the companies to retrieve historical data
                 start (Optional[DateType]): Start date (inclusive) for the historical data
                 end (Optional[DateType]): End date (inclusive) for the historical data
             
@@ -78,9 +75,7 @@ class YFinanceFinancialPuller(FinancialPuller):
         data = {}
 
         for ticker in tickers:
-            ticker_value = ticker.value
-            if ticker_value is not None:
-                dataframe = yf.download(tickers=ticker_value, interval='1mo', start=start, end=end)
-                data[ticker] = self._clean_daily_dataframe(dataframe)
+            dataframe = yf.download(tickers=ticker, interval='1mo', start=start, end=end)
+            data[ticker] = self._clean_daily_dataframe(dataframe)
 
         return data

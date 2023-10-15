@@ -5,7 +5,6 @@ from typing import Dict, List, Optional, Union
 
 from pandas import DataFrame
 
-from ...enums.finance import Ticker
 from ... import utils
 
 
@@ -15,13 +14,13 @@ class FinancialPuller(ABC):
 
     @abstractmethod
     def get_daily_for_tickers(self,
-                              tickers: List[Ticker],
+                              tickers: List[str],
                               start: Optional[utils.types.DateType] = None,
-                              end: Optional[utils.types.DateType] = None) -> Dict[Ticker, DataFrame]:
+                              end: Optional[utils.types.DateType] = None) -> Dict[str, DataFrame]:
         """ Gets historical data from the corresponding tickers
 
             Args:
-                tickers (List[Ticker]): List of tickers for the companies to retrieve historical data
+                tickers (List[str]): List of tickers for the companies to retrieve historical data
                 start (Optional[DateType]): Start date (inclusive) for the historical data
                 end (Optional[DateType]): End date (inclusive) for the historical data
 
@@ -33,13 +32,13 @@ class FinancialPuller(ABC):
 
     @abstractmethod
     def get_monthly_for_tickers(self,
-                                tickers: List[Ticker],
+                                tickers: List[str],
                                 start: Optional[utils.types.DateType] = None,
-                                end: Optional[utils.types.DateType] = None) -> Dict[Ticker, DataFrame]:
+                                end: Optional[utils.types.DateType] = None) -> Dict[str, DataFrame]:
         """ Gets monthly historical data from the corresponding tickers
 
             Args:
-                tickers (List[Ticker]): List of tickers for the companies to retrieve historical data
+                tickers (List[str]): List of tickers for the companies to retrieve historical data
                 start (Optional[DateType]): Start date (inclusive) for the historical data
                 end (Optional[DateType]): End date (inclusive) for the historical data
 
