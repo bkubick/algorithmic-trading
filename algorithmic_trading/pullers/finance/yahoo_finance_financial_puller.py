@@ -12,7 +12,8 @@ from pandas import DataFrame
 
 from ...enums.finance import Ticker
 from ...interface.pullers.financial_puller import FinancialPuller
-from ...utils.finance import numeric_from_str, TICKERS
+from ...utils.finance import numeric_from_str
+from ... import utils
 
 
 class YahooFinancePage(Enum):
@@ -64,7 +65,7 @@ class YahooFinanceFinancialPuller(FinancialPuller):
             Returns:
                 200 Response for the corresponding page, or None
         """
-        ticker_value = TICKERS.get(ticker)
+        ticker_value = ticker.value
         if ticker_value is None:
             return None
 
@@ -75,7 +76,7 @@ class YahooFinanceFinancialPuller(FinancialPuller):
         """ Clears the cached responses """
         self._response_cache: Dict[str, requests.Response] = {}
 
-    def get_daily_for_ticker(self, ticker: Ticker) -> DataFrame:
+    def _get_daily_for_ticker(self, ticker: Ticker) -> DataFrame:
         # TODO Currently, YahooFinance dynamically loads rows, but by default, has 100 on the page.
         # I need to make this scrape by 1-6 month intervals in order to get the remaining data
         """ Gets historical data from the corresponding ticker
@@ -116,12 +117,17 @@ class YahooFinanceFinancialPuller(FinancialPuller):
         data.dropna(axis=0, how='any', inplace=True)
         return data
 
-    def get_daily_for_tickers(self, tickers: List[Ticker]) -> Dict[Ticker, DataFrame]:
+    def get_daily_for_tickers(self,
+                              tickers: List[Ticker],
+                              start: Optional[utils.types.DateType] = None,
+                              end: Optional[utils.types.DateType] = None) -> Dict[Ticker, DataFrame]:
         """ Gets historical data from the corresponding tickers
 
             Args:
                 tickers (List[Ticker]): List of tickers for the companies to retrieve historical data
-            
+                start (Optional[DateType]): Start date (inclusive) for the historical data
+                end (Optional[DateType]): End date (inclusive) for the historical data
+
             Returns
                 Dictionary of dataframes for the corresponding Tickers with the following index and columns
                 index: 'date'
@@ -129,6 +135,12 @@ class YahooFinanceFinancialPuller(FinancialPuller):
         """
         data = {}
         for ticker in tickers:
-            data[ticker] = self.get_daily_for_ticker(ticker=ticker)
-        
+            data[ticker] = self._get_daily_for_ticker(ticker=ticker)
+
         return data
+
+    def get_monthly_for_tickers(self,
+                                tickers: List[Ticker],
+                                start: Optional[utils.types.DateType] = None,
+                                end: Optional[utils.types.DateType] = None) -> Dict[Ticker, DataFrame]:
+        raise NotImplementedError('This is not implemented yet')
