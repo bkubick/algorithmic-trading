@@ -60,23 +60,21 @@ def numeric_from_str(value: str, numeric_type: types.NumericType = int) -> types
     return numeric_type(filtered_value)
 
 
-def get_monthly_return_dataframe(monthly_dataframe: pd.DataFrame,
-                                 fill_na: typing.Optional[types.NumericType] = None) -> pd.DataFrame:
-    """ Gets the monthly return dataframe from the monthly dataframe
+def get_return_from_adj_close(dataframe: pd.DataFrame,
+                              fill_na: types.NumericType = 0) -> pd.DataFrame:
+    """ Gets the return from the adjusted close price of the dataframe.
 
         Args:
-            monthly_dataframe (pd.DataFrame): Monthly dataframe
+            dataframe (pd.DataFrame): dataframe of stock prices
                 Columns: [..., 'adj_close']
-            fill_na (Optional[NumericType]): Fill NA values with this value
+            fill_na (NumericType): Fill NA values with this value. Default is 0.
 
         Returns:
-            (DataFrame) DataFrame with monthly return column added
-                Return Columns: [..., 'adj_close', 'monthly_return']
+            (DataFrame) DataFrame with `return` column added
+                Return Columns: [..., 'adj_close', 'return']
     """
-    monthly_dataframe_copy = monthly_dataframe.copy()
-    monthly_dataframe_copy['monthly_return'] = monthly_dataframe_copy['adj_close'].pct_change()
+    dataframe_copy = dataframe.copy()
+    dataframe_copy['return'] = dataframe_copy['adj_close'].pct_change()
+    dataframe_copy.fillna(fill_na, inplace=True)
 
-    if fill_na is not None:
-        monthly_dataframe_copy.fillna(fill_na, inplace=True)
-
-    return monthly_dataframe_copy
+    return dataframe_copy
