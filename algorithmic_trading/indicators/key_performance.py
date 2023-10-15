@@ -1,23 +1,38 @@
 # coding: utf-8
+from __future__ import annotations
+
+import typing
+
 from pandas import DataFrame, Series
 import numpy as np
 
+from .. import utils
 
-def cagr(df: DataFrame) -> float:
+
+_PERIOD_TO_NUM_PERIODS = {
+    'day': utils.finance.TRADING_DAYS_PER_YEAR,
+    'month': utils.finance.TRADING_MONTHS_PER_YEAR,
+}
+
+
+def cagr(df: DataFrame, period: typing.Optional[str] = None) -> float:
     """ Calculates the Compound Annual Growth Rate (CAGR) for the given dataframe.
 
         Args:
             df (DataFrame): Columns - ['adj_close']
+            period (Optional[str]): Period of the stock prices. Default is 'day'.
 
         Returns:
             Calculated CAGR value for the df.
     """
     new_df = df.copy()
 
-    # TODO: Need to automatically calculate 'n' based of the interval period of df stock prices
-    # 252 = trading days in a year
-    # Because this is daily, n does not change
-    n = len(df) / 252
+    period = period or 'day'
+    num_periods = _PERIOD_TO_NUM_PERIODS.get(period)
+    if num_periods is None:
+        raise ValueError(f'Invalid period: {period}')
+
+    n = len(df) / num_periods
 
     new_df['return'] = new_df['adj_close'].pct_change()
     new_df['cum_return'] = (1 + new_df['return']).cumprod()
@@ -26,19 +41,25 @@ def cagr(df: DataFrame) -> float:
     return cagr
 
 
-def volatility(df: DataFrame) -> float:
+def volatility(df: DataFrame, period: typing.Optional[str] = None) -> float:
     """ Calculates the volatility for the given dataframe.
 
         Args:
             df (DataFrame): Columns - ['adj_close']
+            period (Optional[str]): Period of the stock prices. Default is 'day'.
 
         Returns:
             Calculated volatility value for the df.
     """
     new_df = df.copy()
 
+    period = period or 'day'
+    num_periods = _PERIOD_TO_NUM_PERIODS.get(period)
+    if num_periods is None:
+        raise ValueError(f'Invalid period: {period}')
+
     new_df['return'] = new_df['adj_close'].pct_change()
-    volatility = new_df['return'].std() * np.sqrt(252)
+    volatility = new_df['return'].std() * np.sqrt(num_periods)
     return volatility
 
 
@@ -58,21 +79,27 @@ def sharpe_ratio(df: DataFrame, rf: float = 0.03) -> float:
     return ratio
 
 
-def sortino_ratio(df: DataFrame, rf: float = 0.03) -> float:
+def sortino_ratio(df: DataFrame, rf: float = 0.03, period: typing.Optional[str] = None) -> float:
     """ Calculates the Sortino Ratio for the given dataframe.
 
         Args:
             df (DataFrame): Columns - ['adj_close']
             rf (float):
+            period (Optional[str]): Period of the stock prices. Default is 'day'.
 
         Returns:
             Calculated ratio value for the df.
     """
     new_df = df.copy()
 
+    period = period or 'day'
+    num_periods = _PERIOD_TO_NUM_PERIODS.get(period)
+    if num_periods is None:
+        raise ValueError(f'Invalid period: {period}')
+
     new_df['return'] = new_df['adj_close'].pct_change()
     neg_return = np.where(new_df['return'] > 0, 0, df['return'])
-    neg_volatility = Series(neg_return[neg_return != 0]).std() * np.sqrt(252)
+    neg_volatility = Series(neg_return[neg_return != 0]).std() * np.sqrt(num_periods)
 
     ratio = (cagr(new_df) - rf) / neg_volatility
 
