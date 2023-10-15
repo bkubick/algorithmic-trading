@@ -34,7 +34,10 @@ def cagr(df: DataFrame, period: typing.Optional[str] = None) -> float:
 
     n = len(df) / num_periods
 
-    new_df['return'] = new_df['adj_close'].pct_change()
+    df_columns = set(new_df.columns)
+    if 'return' not in df_columns:
+        new_df = utils.finance.get_return_from_adj_close(new_df)
+
     new_df['cum_return'] = (1 + new_df['return']).cumprod()
 
     cagr = (new_df['cum_return'][-1])**(1/n) - 1
@@ -58,7 +61,10 @@ def volatility(df: DataFrame, period: typing.Optional[str] = None) -> float:
     if num_periods is None:
         raise ValueError(f'Invalid period: {period}')
 
-    new_df['return'] = new_df['adj_close'].pct_change()
+    df_columns = set(new_df.columns)
+    if 'return' not in df_columns:
+        new_df = utils.finance.get_return_from_adj_close(new_df)
+
     volatility = new_df['return'].std() * np.sqrt(num_periods)
     return volatility
 
@@ -97,7 +103,10 @@ def sortino_ratio(df: DataFrame, rf: float = 0.03, period: typing.Optional[str] 
     if num_periods is None:
         raise ValueError(f'Invalid period: {period}')
 
-    new_df['return'] = new_df['adj_close'].pct_change()
+    df_columns = set(new_df.columns)
+    if 'return' not in df_columns:
+        new_df = utils.finance.get_return_from_adj_close(new_df)
+
     neg_return = np.where(new_df['return'] > 0, 0, df['return'])
     neg_volatility = Series(neg_return[neg_return != 0]).std() * np.sqrt(num_periods)
 
@@ -117,7 +126,10 @@ def maximum_drawdown(df: DataFrame) -> float:
     """
     new_df = df.copy()
 
-    new_df['return'] = new_df['adj_close'].pct_change()
+    df_columns = set(new_df.columns)
+    if 'return' not in df_columns:
+        new_df = utils.finance.get_return_from_adj_close(new_df)
+
     new_df['cum_return'] = (1 + new_df['adj_close']).cumprod()
     new_df['cum_roll_max'] = new_df['cum_return'].cummax()
     new_df['drawdown'] = new_df['cum_roll_max'] - new_df['cum_return']
