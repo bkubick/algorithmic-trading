@@ -6,7 +6,7 @@ from pandas import DataFrame
 import yfinance as yf
 
 from ...enums.finance import Ticker
-from ...interface.pullers.financial_puller  import FinancialPuller
+from .financial_puller  import FinancialPuller
 from ... import utils
 
 

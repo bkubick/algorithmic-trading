@@ -11,7 +11,7 @@ from numpy import float64
 from pandas import DataFrame
 
 from ...enums.finance import Ticker
-from ...interface.pullers.financial_puller import FinancialPuller
+from .financial_puller import FinancialPuller
 from ...utils.finance import numeric_from_str
 from ... import utils
 
