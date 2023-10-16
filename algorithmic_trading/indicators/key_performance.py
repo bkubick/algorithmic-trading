@@ -107,7 +107,7 @@ def sortino_ratio(df: DataFrame, rf: float = 0.03, period: typing.Optional[str] 
     if 'return' not in df_columns:
         new_df = utils.finance.get_return_from_adj_close(new_df)
 
-    neg_return = np.where(new_df['return'] > 0, 0, df['return'])
+    neg_return = np.where(new_df['return'] > 0, 0, new_df['return'])
     neg_volatility = Series(neg_return[neg_return != 0]).std() * np.sqrt(num_periods)
 
     ratio = (cagr(new_df) - rf) / neg_volatility
@@ -119,7 +119,7 @@ def maximum_drawdown(df: DataFrame) -> float:
     """ Calculates the Maximum Drawdown for the given dataframe.
 
         Args:
-            df (DataFrame): Columns - ['adj_close']
+            df (DataFrame): Columns - ['return'] or ['adj_close']
 
         Returns:
             Calculated Max Drawdown value for the df.
@@ -130,7 +130,7 @@ def maximum_drawdown(df: DataFrame) -> float:
     if 'return' not in df_columns:
         new_df = utils.finance.get_return_from_adj_close(new_df)
 
-    new_df['cum_return'] = (1 + new_df['adj_close']).cumprod()
+    new_df['cum_return'] = (1 + new_df['return']).cumprod()
     new_df['cum_roll_max'] = new_df['cum_return'].cummax()
     new_df['drawdown'] = new_df['cum_roll_max'] - new_df['cum_return']
 
