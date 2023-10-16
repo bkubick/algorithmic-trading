@@ -6,6 +6,7 @@ import typing
 from pandas import DataFrame, Series
 import numpy as np
 
+from ..pullers.finance.financial_puller import FinancialPuller
 from .. import utils
 
 
@@ -154,11 +155,11 @@ def calmar_ratio(df: DataFrame) -> float:
 
 
 def average_true_range(df: DataFrame, periods: int = 14) -> float:
-    """ Calculates the Average True Range (ATR) for the given dataframe.
+    """ Calculates the Average True Range (ATR) for the given position information.
     
         Args:
             df (DataFrame): Columns - ['high', 'low', 'close']
-            n (int): Number of periods to calculate the ATR for. Default is 14.
+            periods (int): Number of periods to calculate the ATR for. Default is 14.
         
         Returns:
             (float) Calculated ATR value for the df.
