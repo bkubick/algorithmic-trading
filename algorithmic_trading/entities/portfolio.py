@@ -26,6 +26,15 @@ class Position:
     current_price: Decimal
     current_datetime: datetime
 
+    @property
+    def total_return(self) -> Decimal:
+        """ Calculates the return value of the position.
+
+            Returns:
+                (Decimal) Return value.
+        """
+        return (self.current_price - self.purchase_price) * self.shares
+
 
 @dataclass
 class Portfolio:
@@ -80,6 +89,15 @@ class Portfolio:
                 (Decimal) Position value.
         """
         return sum([position.current_price * position.shares for position in self.positions])
+
+    @property
+    def total_position_return(self) -> Decimal:
+        """ Calculates the total position return for the portfolio.
+
+            Returns:
+                (Decimal) Portfolio position return.
+        """
+        return sum([position.total_return for position in self.positions])
 
     @property
     def total_value(self) -> Decimal:
