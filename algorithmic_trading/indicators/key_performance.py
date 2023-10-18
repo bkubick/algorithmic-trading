@@ -152,37 +152,3 @@ def calmar_ratio(df: DataFrame) -> float:
     new_df = df.copy()
 
     return cagr(new_df) / maximum_drawdown(new_df)
-
-
-def average_true_range(df: DataFrame, periods: int = 14) -> float:
-    """ Calculates the Average True Range (ATR) for the given position information.
-    
-        Args:
-            df (DataFrame): Columns - ['high', 'low', 'close']
-            periods (int): Number of periods to calculate the ATR for. Default is 14.
-        
-        Returns:
-            (float) Calculated ATR value for the df.
-    """
-    data = df.copy()
-
-    # Ensure that the DataFrame is sorted by date
-    data = data.sort_values(by='date').reset_index(drop=True)
-
-    # Calculate True Range (TR) for the DataFrame
-    data['h-l'] = data['high'] - data['low']
-    data['h-yc'] = abs(data['high'] - data['close'].shift(1))
-    data['l-yc'] = abs(data['low'] - data['close'].shift(1))
-    data['tr'] = data[['h-l', 'h-yc', 'l-yc']].max(axis=1)
-
-    # Calculate the first ATR
-    first_atr = data['tr'][:periods].mean()
-
-    # Calculate subsequent ATR values
-    atr_values = [first_atr]
-    for i in range(periods, len(data)):
-        tr = data['tr'].iloc[i]
-        atr = (atr_values[-1] * (periods - 1) + tr) / periods
-        atr_values.append(atr)
-
-    return atr_values[-1]
