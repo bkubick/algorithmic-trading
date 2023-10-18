@@ -10,11 +10,14 @@ import numpy as np
 
 # TODO: Replace the DataFrame typehint with StockDataFrame once I get it made
 def macd(df: DataFrame, a: int = 12, b: int = 26, c: int = 9) -> DataFrame:
-    """
+    """ Moving Average Convergence Divergence
         https://www.tradingview.com/scripts/macd/?solution=43000502344
 
         Args:
-            df (DataFrame): Columns - ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+            df (DataFrame): Columns - ['adj_close']
+        
+        Returns:
+            DataFrame: Columns - ['ma_fast', 'ma_slow', 'macd', 'signal']
     """
     new_df = df.copy()
 
@@ -23,7 +26,8 @@ def macd(df: DataFrame, a: int = 12, b: int = 26, c: int = 9) -> DataFrame:
     new_df['macd'] = new_df['ma_fast'] - new_df['ma_slow']
     new_df['signal'] = new_df['macd'].ewm(span=c, min_periods=c).mean()
 
-    return new_df
+    columns = ['ma_fast', 'ma_slow', 'macd', 'signal']
+    return new_df[columns]
 
 
 def _rma(df: Series, n: int = 14) -> Series:
@@ -42,7 +46,10 @@ def rsi(df: DataFrame, n: int = 14) -> DataFrame:
         https://www.tradingview.com/pine-script-reference/v5/#fun_ta%7Bdot%7Drsi
 
         Args:
-            df (DataFrame): Columns - ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+            df (DataFrame): Columns - ['adj_close']
+        
+        Returns:
+            DataFrame: Columns - ['gain', 'loss', 'avg_gain', 'avg_loss', 'relative_strength', 'rsi']
     """
     new_df = df.copy()
 
@@ -59,12 +66,15 @@ def rsi(df: DataFrame, n: int = 14) -> DataFrame:
 
 
 # TODO: Replace the DataFrame typehint with StockDataFrame once I get it made
-def atr(df: DataFrame, n: int = 14) -> Series:
-    """
+def average_true_range(df: DataFrame, n: int = 14) -> Series:
+    """ Average True Range
         https://www.tradingview.com/scripts/averagetruerange/?solution=43000501823
 
         Args:
-            df (DataFrame): Columns - ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+            df (DataFrame): Columns - ['high', 'low', 'adj_close']
+        
+        Returns:
+            Series: ATR values
     """
     new_df = df.copy()
 
@@ -82,8 +92,12 @@ def atr(df: DataFrame, n: int = 14) -> Series:
 # TODO: Replace the DataFrame typehint with StockDataFrame once I get it made
 def bbands(df: DataFrame, n: int = 14) -> DataFrame:
     """ Bollinger Bands
+
         Args:
-            df (DataFrame): Columns - ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+            df (DataFrame): Columns - ['adj_close']
+        
+        Returns:
+            DataFrame: Columns - ['middle_band', 'upper_band', 'lower_band', 'bollinger_band_width']
     """
     new_df = df.copy()
 
@@ -104,7 +118,13 @@ def adx(df: DataFrame, n: int = 20) -> DataFrame:
         https://www.tradingview.com/pine-script-reference/v5/#fun_ta%7Bdot%7Ddmi
 
         Args:
-            df (DataFrame): Columns - ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+            df (DataFrame): Columns - ['high', 'low', 'adj_close']
+        
+        Returns:
+            DataFrame: Columns - [
+                'avg_true_range', 'up_move', 'down_move', 'plus_down_move', 'minus_down_move',
+                'plus_directional_indicator', 'minus_directional_indicator', 'adx',
+            ]
     """
     new_df = df.copy()
 
