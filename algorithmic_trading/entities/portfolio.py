@@ -5,7 +5,39 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
+from enum import Enum
 import typing
+
+from ..utils import types
+
+
+class TransactionType(Enum):
+    """ Transaction type enum to hold the transaction type information
+
+        Attributes:
+            BUY (str): Buy transaction type
+            SELL (str): Sell transaction type
+    """
+    BUY = 'BUY'
+    SELL = 'SELL'
+
+
+@dataclass
+class Transaction:
+    """ Transaction dataclass to hold the transaction information
+
+        Attributes:
+            ticker (types.TickerType): Ticker symbol
+            shares (Decimal): Number of shares
+            price (Decimal): Price
+            datetime (datetime): Datetime
+            transaction_type (TransactionType): Transaction type
+    """
+    ticker: types.TickerType
+    shares: Decimal
+    price: Decimal
+    datetime: datetime
+    transaction_type: TransactionType
 
 
 @dataclass
@@ -13,27 +45,24 @@ class Position:
     """ Position dataclass to hold the position information
 
         Attributes:
-            ticker (str): Ticker symbol
+            ticker (types.TickerType): Ticker symbol
             shares (Decimal): Number of shares
-            purchase_price (Decimal): Purchase price
-            purchase_date (datetime): Purchase date
             current_price (Decimal): Current price
+            current_datetime (datetime): Current datetime
     """
-    ticker: str
+    ticker: types.TickerType
     shares: Decimal
-    purchase_price: Decimal
-    purchased_at: datetime
     current_price: Decimal
     current_datetime: datetime
 
     @property
-    def total_return(self) -> Decimal:
-        """ Calculates the return value of the position.
+    def value(self) -> Decimal:
+        """ Calculates the value of the position.
 
             Returns:
                 (Decimal) Return value.
         """
-        return (self.current_price - self.purchase_price) * self.shares
+        return self.shares * self.current_price
 
 
 @dataclass
@@ -64,22 +93,79 @@ class Portfolio:
     end_date: typing.Optional[date]
     starting_cash: Decimal
     available_cash: Decimal
-    positions: typing.List[Position]
+    positions: typing.Dict[types.TickerType, Position]
+    transactions: typing.Dict[types.TickerType, typing.List[Transaction]]
 
-    def get_position(self, ticker: str) -> typing.Optional[Position]:
-        """ Gets the position for the given ticker.
+    def buy(self, ticker: types.TickerType,
+            shares: Decimal,
+            purchase_price: Decimal,
+            current_price: Decimal) -> None:
+        """ Buys the given number of shares for the given ticker.
 
             Args:
-                ticker (str): Ticker symbol to get the position for.
-
-            Returns:
-                (Optional[Position]) Position for the given ticker.
+                ticker (types.TickerType): Ticker symbol to buy.
+                shares (Decimal): Number of shares to buy.
+                purchase_price (Decimal): Purchase price.
+                current_price (Decimal): Current price.
         """
-        for position in self.positions:
-            if position.ticker == ticker:
-                return position
+        position = self.positions.get(ticker)
 
-        return None
+        if position is None:
+            position = Position(ticker=ticker,
+                                shares=shares,
+                                current_price=current_price,
+                                current_datetime=datetime.now())
+
+            self.positions[ticker] = position
+        else:
+            position.shares += shares
+            position.current_price = current_price
+
+        transaction = Transaction(ticker=ticker,
+                                  shares=shares,
+                                  price=purchase_price,
+                                  datetime=datetime.now(),
+                                  transaction_type=TransactionType.BUY)
+
+        self._add_transaction(transaction)
+        self.available_cash -= shares * position.current_price
+
+    def sell(self, ticker: str, shares: Decimal) -> None:
+        """ Sells the given number of shares for the given ticker.
+
+            Args:
+                ticker (str): Ticker symbol to sell.
+                shares (Decimal): Number of shares to sell.
+        """
+        position = self.positions.get(ticker)
+
+        if position is None:
+            raise ValueError(f'Position for ticker {ticker} does not exist in the portfolio')
+
+        position.shares -= shares
+        self.available_cash += shares * position.current_price
+
+        transaction = Transaction(ticker=ticker,
+                                  shares=shares,
+                                  price=position.current_price,
+                                  datetime=datetime.now(),
+                                  transaction_type=TransactionType.SELL)
+
+        self._add_transaction(transaction)
+
+        if position.shares == 0:
+            del self.positions[ticker]
+
+    def _add_transaction(self, transaction: Transaction) -> None:
+        """ Adds the given transaction to the portfolio.
+        
+            Args:
+                transaction (Transaction): Transaction to add.
+        """
+        if transaction.ticker in self.transactions:
+            self.transactions[transaction.ticker].append(transaction)
+        else:
+            self.transactions[transaction.ticker] = [transaction]
 
     @property
     def position_value(self) -> Decimal:
@@ -88,16 +174,7 @@ class Portfolio:
             Returns:
                 (Decimal) Position value.
         """
-        return sum([position.current_price * position.shares for position in self.positions])
-
-    @property
-    def total_position_return(self) -> Decimal:
-        """ Calculates the total position return for the portfolio.
-
-            Returns:
-                (Decimal) Portfolio position return.
-        """
-        return sum([position.total_return for position in self.positions])
+        return sum([position.current_price * position.shares for position in self.positions.values()])
 
     @property
     def total_value(self) -> Decimal:
@@ -136,21 +213,36 @@ class Portfolio:
         return len(self.positions)
     
     @property
-    def position_allocations(self) -> typing.Dict[str, Decimal]:
+    def position_allocations(self) -> typing.Dict[types.TickerType, Decimal]:
         """ Calculates the position allocation for the portfolio.
 
             Returns:
-                (Dict[str, Decimal]) Position allocation.
+                (Dict[types.TickerType, Decimal]) Position allocation.
         """
-        return {position.ticker: position.current_price * position.shares for position in self.positions}
+        allocations_by_ticker = {}
+        for position in self.positions.values():
+            if position.ticker in allocations_by_ticker:
+                allocations_by_ticker[position.ticker] += position.current_price * position.shares
+            else:
+                allocations_by_ticker[position.ticker] = position.current_price * position.shares
+
+        return allocations_by_ticker
 
     @property
-    def position_allocation_percentages(self) -> typing.Dict[str, Decimal]:
+    def position_allocation_percentages(self) -> typing.Dict[types.TickerType, Decimal]:
         """ Calculates the position allocation percentage for the portfolio.
 
             Returns:
-                (Dict[str, Decimal]) Position allocation percentage.
+                (Dict[types.TickerType, Decimal]) Position allocation percentage.
         """
         position_allocations = self.position_allocations
         total_allocation = Decimal(sum(position_allocations.values()))
-        return {ticker: allocation / total_allocation for ticker, allocation in position_allocations.items()}
+
+        position_allocation_weights = {}
+        for ticker, allocation in position_allocations.items():
+            if ticker in position_allocation_weights:
+                position_allocation_weights[ticker] += allocation / total_allocation
+            else:
+                position_allocation_weights[ticker] = allocation / total_allocation
+
+        return position_allocation_weights
